@@ -1,0 +1,32 @@
+[package]
+name = "logging"
+version = "0.1.0"
+edition = "2021"
+
+build = "build.rs"
+
+[lib]
+name = "logging_lib"
+path = "lib/lib.rs"
+
+[[bin]]
+name = "logging_service"
+path = "src/main.rs"
+
+
+[features]
+default = ["grpc"]
+grpc = []
+websocket = []
+
+[dependencies]
+tonic = "0.12.1"
+prost = "0.13.1"
+tokio = { version = "1.39.3", features = ["rt", "rt-multi-thread", "macros"] }
+tonic-reflection = "0.12.1"
+
+tracing = "0.1.40"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+
+[build-dependencies]
+tonic-build = "0.12.1"
