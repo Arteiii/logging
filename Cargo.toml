@@ -20,9 +20,12 @@ grpc = []
 websocket = []
 
 [dependencies]
-tonic = "0.12.1"
 prost = "0.13.1"
 tokio = { version = "1.39.3", features = ["rt", "rt-multi-thread", "macros"] }
+
+
+# 1.12 breaks reflection in some tools (insomnia)
+tonic = "0.12.1"
 tonic-reflection = "0.12.1"
 
 tracing = "0.1.40"

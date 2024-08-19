@@ -1,29 +1,27 @@
-#[cfg(any(feature = "grpc", feature = "websocket"))]
-use tokio;
-
-
-
+mod core;
 #[cfg(feature = "grpc")]
 mod grpc;
 
-
 #[cfg(feature = "grpc")]
 async fn grpc_function() {
-    println!("gRPC running");
+    tracing::info!("gRPC running");
     grpc::grpc_main().await.expect("TODO: panic message");
-    println!("gRPC stopped");
+    tracing::info!("gRPC stopped");
 }
 
 #[cfg(feature = "websocket")]
 async fn websocket_function() {
-    println!("WebSocket running");
+    tracing::info!("WebSocket running");
     // TODO:! add ws impl.
 }
-
 
 #[cfg(any(feature = "grpc", feature = "websocket"))]
 #[tokio::main]
 async fn main() {
+    use logging_lib::init_tracing;
+
+    init_tracing!("LOGGING_SERVICE_LOG");
+
     let mut handles = vec![];
 
     #[cfg(feature = "grpc")]

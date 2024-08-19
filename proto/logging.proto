@@ -1,21 +1,66 @@
 syntax = "proto3";
+
 package logging;
 
 service Logger {
   rpc Log (LogRequest) returns (LogResponse);
+  rpc RegisterApplication (RegisterAppRequest) returns (RegisterAppResponse);
+  rpc RegisterClient (RegisterClientRequest) returns (RegisterClientResponse);
+}
+
+message ApplicationAuth {
+  string app_name = 1;
+  string api_key = 2;
+}
+
+message ClientAuth {
+  string client_id = 1;
+  string client_secret = 2;
+}
+
+message Status {
+  int32 success = 1; // 0 = success else error (i will create a list of possible errors later)
+  string message = 2;
 }
 
 message LogRequest {
-  string message = 1;
-  LogLevel level = 2;
+  ApplicationAuth auth = 1;
+  ClientAuth client_auth = 2;
+  LogLevel level = 3;
+  string message = 4;
 }
 
 message LogResponse {
-  bool success = 1;
+  Status status = 1;
+}
+
+message RegisterAppRequest {
+  string name = 1;
+}
+
+message RegisterAppResponse {
+  Status status = 1;
+  //  AuthInfo auth = 2;
+}
+
+message RegisterClientRequest {
+  ApplicationAuth auth = 1;
+  // names can be reused as the primary identifier is the client_id
+  string client_name = 2;
+  // to verify integrity will be hashed on the server
+  string client_secret = 3;
+}
+
+message RegisterClientResponse {
+  Status status = 1;
+
+  // a uuid that's assigned to this client it stores the application & client name
+  string client_id = 2;
 }
 
 enum LogLevel {
-  INFO = 0;
-  WARNING = 1;
-  ERROR = 2;
+  UNKNOWN = 0;  // Default value
+  INFO = 1;
+  WARNING = 2;
+  ERROR = 3;
 }
