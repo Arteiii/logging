@@ -44,6 +44,27 @@ To get started with the Logging Service, follow these instructions:
     cargo run
     ```
 
+### Using `nix-shell`
+
+1. **Enter the Development Shell**:
+
+   Navigate to your project directory and run:
+
+   ```bash
+   nix-shell
+   ```
+
+   This command will drop you into a shell with all the necessary tools for building and running the service,
+   including Rust and the Protocol Buffers Compiler (`protoc`).
+
+2. **Build and Run the Service**:
+
+   Inside the `nix-shell`, you can build and run the service as usual:
+
+   ```bash
+   cargo run
+   ```
+
 ## Usage
 
 ### gRPC Service
@@ -121,53 +142,6 @@ The Logging Service exposes the following gRPC methods:
 
 - **status**: `StatusResponse` - Status of the registration request.
 - **client_id**: `string` - Unique identifier for the client.
-
-
-## Development Environment
-
-To simplify the development environment setup and ensure consistency across different systems, 
-the Logging Service project includes a `nix-shell` configuration. 
-This allows you to easily enter a shell with all the necessary dependencies and tools installed, 
-without affecting your global environment.
-
-### Using `nix-shell`
-
-### Prerequisites
-
-- [Nix](https://nixos.org/download.html) - A package manager for Linux and other Unix systems.
-
-### Setup
-
-1. **Enter the Development Shell**:
-
-   Navigate to your project directory and run:
-
-   ```bash
-   nix-shell
-   ```
-
-   This command will drop you into a shell with all the necessary tools for building and running the service, 
-      including Rust and the Protocol Buffers Compiler (`protoc`).
-
-2. **Build and Run the Service**:
-
-   Inside the `nix-shell`, you can build and run the service as usual:
-
-   ```bash
-   cargo run
-   ```
-
-### Customizing the Shell
-
-If you need to add more dependencies or customize the development environment, 
-you can modify the `shell.nix` file located in the root of the project. 
-For more details on how to configure `nix-shell`, 
-you can refer to the [Nix documentation](https://nixos.org/manual/nixpkgs/stable/#sec-language-rust).
-
-### Further Reading
-
-- [Nixpkgs and NixOS Manual](https://nixos.org/manual/nixpkgs/stable/)
-- [Introduction to `nix-shell`](https://nixos.wiki/wiki/Development_environment_with_nix-shell)
 
 
 ## License
