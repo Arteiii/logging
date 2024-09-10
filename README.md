@@ -115,6 +115,13 @@ The Logging Service exposes the following gRPC methods:
 }
 ```
 
+## Running Tests
+
+To run the tests using ghz, use the following command:
+```shell
+ghz --config=testing/test.json --insecure --concurrency=100 --rps=5000 --total=10000 --duration=10m --proto=proto/logging.proto -- 0.0.0.0:4444
+```
+
 ## API Reference
 
 ### `LogRequest`

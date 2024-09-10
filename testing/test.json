@@ -1,0 +1,54 @@
+{
+  "proto": "../proto/logging.proto",
+  "call": "logging.Logger/Log",
+  "data": {
+    "auth": {
+      "app_name": "TestApp",
+      "api_key": "test-api-key"
+    },
+    "client_auth": {
+      "client_id": "test-client-id",
+      "client_secret": "test-client-secret"
+    },
+    "level": "INFO",
+    "message": "Test log message"
+  },
+  "insecure": true,
+  "tests": [
+    {
+      "name": "TestLog",
+      "call": "logging.Logger/Log",
+      "data": {
+        "auth": {
+          "app_name": "TestApp",
+          "api_key": "test-api-key"
+        },
+        "client_auth": {
+          "client_id": "test-client-id",
+          "client_secret": "test-client-secret"
+        },
+        "level": "INFO",
+        "message": "This is a test log"
+      }
+    },
+    {
+      "name": "TestRegisterApplication",
+      "call": "logging.Logger/RegisterApplication",
+      "data": {
+        "name": "TestApp"
+      }
+    },
+    {
+      "name": "TestRegisterClient",
+      "call": "logging.Logger/RegisterClient",
+      "data": {
+        "auth": {
+          "app_name": "TestApp",
+          "api_key": "test-api-key"
+        },
+        "client_name": "TestClient",
+        "client_secret": "test-client-secret"
+      }
+    }
+  ]
+}

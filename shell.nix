@@ -7,6 +7,7 @@ pkgs.mkShell {
     pkgs.rustfmt
     pkgs.clippy
     pkgs.protobuf
+    pkgs.ghz # for testing
   ];
 
   # set environment
