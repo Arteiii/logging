@@ -1,18 +1,22 @@
+use std::sync::Arc;
+use crate::core::Logging;
+
 mod core;
 #[cfg(feature = "grpc")]
 mod grpc;
 
+
 #[cfg(feature = "grpc")]
-async fn grpc_function() {
+async fn grpc_function(core: Arc<Logging>) {
     tracing::info!("gRPC running");
-    grpc::grpc_main().await.expect("TODO: panic message");
+    grpc::grpc_main(core).await.expect("gRPC failed");
     tracing::info!("gRPC stopped");
 }
 
 #[cfg(feature = "websocket")]
-async fn websocket_function() {
+async fn websocket_function(core: Arc<Logging>) {
     tracing::info!("WebSocket running");
-    // TODO:! add ws impl.
+    // TODO: add WebSocket implementation
 }
 
 #[cfg(any(feature = "grpc", feature = "websocket"))]
@@ -22,13 +26,24 @@ async fn main() {
 
     init_tracing!("LOGGING_SERVICE_LOG");
 
+    // todo! better method for setting (environment or config file)
+    let database_url = "postgres://devuser:devpass@localhost/devdb";
+    let core = Arc::new(Logging::new(database_url).await.expect("Failed to initialize Logging"));
+        
+    
     let mut handles = vec![];
 
     #[cfg(feature = "grpc")]
-    handles.push(tokio::spawn(grpc_function()));
+    {
+        let core_clone_grpc = core.clone();
+        handles.push(tokio::spawn(grpc_function(core_clone_grpc)));
+    }
 
     #[cfg(feature = "websocket")]
-    handles.push(tokio::spawn(websocket_function()));
+    {
+        let core_clone_web = core.clone();
+        handles.push(tokio::spawn(websocket_function(core_clone_web)));
+    }
 
     for handle in handles {
         handle.await.unwrap();

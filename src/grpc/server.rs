@@ -1,11 +1,12 @@
 use std::str::FromStr;
+use std::sync::Arc;
 
 use tonic::{Code, Request, Response, Status};
 
 use logging_lib::proto;
 pub use logging_lib::proto::{
-    logger_server::{Logger, LoggerServer},
     FILE_DESCRIPTOR_SET,
+    logger_server::{Logger, LoggerServer},
 };
 use logging_lib::proto::{
     LogLevel, LogRequest, LogResponse, RegisterAppRequest, RegisterAppResponse,
@@ -13,12 +14,17 @@ use logging_lib::proto::{
 };
 
 use crate::core;
-use crate::core::ClientData;
+use crate::core::{ClientData, Logging};
 
-#[derive(Debug, Default)]
-pub struct LoggingService {}
+pub struct LoggingService {
+    core: Arc<Logging>,
+}
 
-impl LoggingService {}
+impl LoggingService {
+    pub fn new(core: Arc<Logging>) -> Self {
+        LoggingService { core }
+    }
+}
 
 #[tonic::async_trait]
 impl Logger for LoggingService {
@@ -38,12 +44,14 @@ impl Logger for LoggingService {
             client_name: None,
         };
 
-        match core::Logging::log(
-            core::LogLevel::from_str(log_level.as_str_name()).unwrap(),
-            &log_message,
-            client_data,
-        )
-        .await
+        match self
+            .core
+            .log(
+                core::LogLevel::from_str(log_level.as_str_name()).unwrap(),
+                &log_message,
+                client_data,
+            )
+            .await
         {
             Ok(msg) => Ok(Response::new(LogResponse {
                 status: Option::from(proto::Status {

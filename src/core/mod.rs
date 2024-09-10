@@ -1,3 +1,8 @@
+pub mod database;
+
+use sqlx::PgPool;
+use crate::core::database::initialize_schema;
+
 #[allow(clippy::upper_case_acronyms)]
 #[derive(Debug)]
 pub enum LogLevel {
@@ -73,10 +78,24 @@ impl std::fmt::Debug for ClientData {
     }
 }
 
-pub struct Logging {}
+pub struct Logging {
+    pub db_pool: PgPool,
+}
+
+
 
 impl Logging {
+    pub async fn new(database_url: &str) -> Result<Self, sqlx::Error> {
+        let db_pool = PgPool::connect(database_url).await?;
+
+        initialize_schema(&db_pool).await?;
+        
+        Ok(Self { db_pool })
+    }
+
+    
     pub async fn log(
+        &self,
         log_level: LogLevel,
         msg: &str,
         client_data: ClientData,
