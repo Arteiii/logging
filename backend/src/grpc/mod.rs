@@ -1,5 +1,5 @@
-use std::sync::Arc;
 use crate::core::Logging;
+use std::sync::Arc;
 
 pub mod server;
 
@@ -13,7 +13,9 @@ pub async fn grpc_main(core: Arc<Logging>) -> Result<(), Box<dyn std::error::Err
                 .register_encoded_file_descriptor_set(server::FILE_DESCRIPTOR_SET)
                 .build()?,
         )
-        .add_service(server::LoggerServer::new(server::LoggingService::new(core.clone())))
+        .add_service(server::LoggerServer::new(server::LoggingService::new(
+            core.clone(),
+        )))
         .serve(addr)
         .await?;
 

@@ -1,13 +1,14 @@
 use std::str::FromStr;
 use std::sync::Arc;
-
-use tonic::{Code, Request, Response, Status};
-
+use tokio::task;
+use tonic::{Request, Response, Status};
+use tracing::trace;
 use logging_lib::proto;
 pub use logging_lib::proto::{
-    FILE_DESCRIPTOR_SET,
     logger_server::{Logger, LoggerServer},
+    FILE_DESCRIPTOR_SET,
 };
+
 use logging_lib::proto::{
     LogLevel, LogRequest, LogResponse, RegisterAppRequest, RegisterAppResponse,
     RegisterClientRequest, RegisterClientResponse,
@@ -29,7 +30,7 @@ impl LoggingService {
 #[tonic::async_trait]
 impl Logger for LoggingService {
     async fn log(&self, request: Request<LogRequest>) -> Result<Response<LogResponse>, Status> {
-        tracing::trace!("core called");
+        trace!("core called");
 
         let log_request = request.into_inner();
 
@@ -44,25 +45,36 @@ impl Logger for LoggingService {
             client_name: None,
         };
 
-        match self
-            .core
-            .log(
-                core::LogLevel::from_str(log_level.as_str_name()).unwrap(),
-                &log_message,
-                client_data,
-            )
-            .await
-        {
-            Ok(msg) => Ok(Response::new(LogResponse {
-                status: Option::from(proto::Status {
-                    success: 0,
-                    message: msg,
-                }),
-            })),
-            Err(msg) => Err(Status::new(Code::Unknown, msg)),
-        }
-    }
+        // Send the response immediately
+        let response = Response::new(LogResponse {
+            status: Some(proto::Status {
+                success: 0,
+                message: "Log request received, processing in the background.".to_string(),
+            }),
+        });
 
+        // Spawn a new task to handle logging in the background
+        let core_clone = self.core.clone();
+        let log_level_str = log_level.as_str_name().to_string();
+        let log_message_clone = log_message.clone();
+        let client_data_clone = client_data.clone();
+
+        task::spawn(async move {
+            if let Err(e) = core_clone
+                .log(
+                    core::LogLevel::from_str(&log_level_str).unwrap(),
+                    &log_message_clone,
+                    client_data_clone,
+                )
+                .await
+            {
+                tracing::error!("Failed to process log entry in background: {}", e);
+            }
+        });
+
+        // Return the immediate response
+        Ok(response)
+    }
     async fn register_application(
         &self,
         request: Request<RegisterAppRequest>,

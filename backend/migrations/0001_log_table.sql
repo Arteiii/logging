@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS logs (
     id SERIAL PRIMARY KEY,
+    level TEXT NOT NULL,
     message TEXT NOT NULL,
+    client_id TEXT NOT NULL,
     created_at TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP
 );

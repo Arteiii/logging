@@ -1,10 +1,9 @@
-use std::sync::Arc;
 use crate::core::Logging;
+use std::sync::Arc;
 
 mod core;
 #[cfg(feature = "grpc")]
 mod grpc;
-
 
 #[cfg(feature = "grpc")]
 async fn grpc_function(core: Arc<Logging>) {
@@ -28,9 +27,12 @@ async fn main() {
 
     // todo! better method for setting (environment or config file)
     let database_url = "postgres://devuser:devpass@localhost/devdb";
-    let core = Arc::new(Logging::new(database_url).await.expect("Failed to initialize Logging"));
-        
-    
+    let core = Arc::new(
+        Logging::new(database_url)
+            .await
+            .expect("Failed to initialize Logging"),
+    );
+
     let mut handles = vec![];
 
     #[cfg(feature = "grpc")]

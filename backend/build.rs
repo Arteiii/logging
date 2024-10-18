@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("cargo:rerun-if-changed=proto");
-    
+
     let out_dir = PathBuf::from(std::env::var("OUT_DIR").unwrap());
 
     tonic_build::configure()
